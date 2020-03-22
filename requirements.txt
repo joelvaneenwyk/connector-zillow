@@ -1,0 +1,5 @@
+requests
+unicodecsv
+argparse
+lxml
+python-anticaptcha
