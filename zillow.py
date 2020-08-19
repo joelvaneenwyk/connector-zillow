@@ -7,9 +7,20 @@ from lxml import html
 import requests
 import unicodecsv as csv
 import argparse
-
+import pathlib
+import sys
 
 def parse(zip_code: str, filter_request: Optional[str] = None) -> List[Dict[str, Any]]:
+    
+    cookies_path = pathlib.Path().cwd().joinpath('cookie.txt')
+
+    cookies_data = {}
+    with cookies_path.open() as fp:
+        for line in fp:
+            array = line.split('\t')
+            key = array.pop(0)
+            cookies_data.setdefault(key, array[1])
+
     if filter_request == "newest":
         url = f"https://www.zillow.com/homes/for_sale/{zip_code}/0_singlestory/days_sort"
     elif filter_request == "cheapest":
@@ -19,8 +30,10 @@ def parse(zip_code: str, filter_request: Optional[str] = None) -> List[Dict[str,
               f"&shouldFireSellPageImplicitClaimGA=false&fromHomePageTab=buy "
 
     for i in range(5):
-        response = requests.request("GET", url, headers={}, data={})
+        response = requests.request("GET", url, headers={}, data={}, cookies=cookies_data)
+        print(response.text)
         print(response.status_code)
+
         parser = html.fromstring(response.text)
         search_results = parser.xpath("//div[@id='search-results']//article")
         properties_list: List[Dict[str, Any]] = []
