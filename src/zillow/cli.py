@@ -3,15 +3,27 @@
 
 import asyncio
 from playwright.async_api import async_playwright
-from typing import Optional, List, Any, Dict
+from typing import Optional, List, Any, Dict, TYPE_CHECKING
 
 from lxml import html
-import requests
 import unicodecsv as csv
 import pathlib
 
+if TYPE_CHECKING:
+    from playwright.async_api._generated import Browser
 
-def parse(zip_code: str, filter_request: Optional[str] = None) -> List[Dict[str, Any]]:
+
+class InputData:
+    def __init__(self, zip_code: str, sort: str):
+        self.zip_code = zip_code
+        self.sort = sort
+
+
+async def parse(browser: 'Browser', input_data: InputData, filter_request: Optional[str] = None) -> List[Dict[str, Any]]:
+    """Given already opened browser and set of input data, parse Zillow sites to scrape the data we need."""
+
+    page = await browser.new_page()
+
     cookies_path = pathlib.Path().cwd().joinpath("cookie.txt")
 
     cookies_data = {}
@@ -21,33 +33,40 @@ def parse(zip_code: str, filter_request: Optional[str] = None) -> List[Dict[str,
                 array = line.split("\t")
                 key = array.pop(0)
                 cookies_data.setdefault(key, array[1])
-    except:
+    except IOError:
         print("Cookie file not found. Please log in and save the cookies to continue")
 
     if filter_request == "newest":
         url = (
-            f"https://www.zillow.com/homes/for_sale/{zip_code}/0_singlestory/days_sort"
+            f"https://www.zillow.com/homes/for_sale/{input_data.zip_code}/0_singlestory/days_sort"
         )
     elif filter_request == "cheapest":
-        url = f"https://www.zillow.com/homes/for_sale/{zip_code}/0_singlestory/pricea_sort/"
+        url = f"https://www.zillow.com/homes/for_sale/{input_data.zip_code}/0_singlestory/pricea_sort/"
     else:
         url = (
-            f"https://www.zillow.com/homes/for_sale/{zip_code}_rb/?fromHomePage=true"
+            f"https://www.zillow.com/homes/for_sale/{input_data.zip_code}_rb/?fromHomePage=true"
             f"&shouldFireSellPageImplicitClaimGA=false&fromHomePageTab=buy "
         )
 
+    properties_list: List[Dict[str, Any]] = []
     for i in range(5):
-        response = requests.request(
-            "GET", url, headers={}, data={}, cookies=cookies_data
-        )
-        print(response.text)
-        print(response.status_code)
+        # response = requests.request(
+        #     "GET", url, headers={}, data={}, cookies=cookies_data
+        # )
+        await page.goto(url)
+        page_data = await page.content()
+        await page.screenshot(path=f"example-{i}.png")
+        print(f"Fetching data for {input_data.zip_code}")
+        print(page_data)
+        # print(response.status_code)
 
-        parser = html.fromstring(response.text)
+        parser = html.fromstring(page_data)
         search_results = parser.xpath("//div[@id='search-results']//article")
-        properties_list: List[Dict[str, Any]] = []
 
         for properties in search_results:
+            if not isinstance(properties, html.HtmlElement):
+                continue
+
             raw_address = properties.xpath(
                 ".//span[@itemprop='address']//span[@itemprop='streetAddress']//text()"
             )
@@ -97,14 +116,31 @@ def parse(zip_code: str, filter_request: Optional[str] = None) -> List[Dict[str,
     return properties_list
 
 
-async def get_page():
+async def get_page(input_data: InputData):
     async with async_playwright() as p:
         for browser_type in [p.chromium, p.firefox, p.webkit]:
             browser = await browser_type.launch()
-            page = await browser.new_page()
-            await page.goto("http://playwright.dev")
-            await page.screenshot(path=f"example-{browser_type.name}.png")
-            await browser.close()
+            try:
+                scraped_data = await parse(browser, input_data)
+                print("Writing data to output file")
+                with open(f"properties-{input_data.zip_code}.csv", "wb") as csv_file:
+                    fieldnames = [
+                        "title",
+                        "address",
+                        "city",
+                        "state",
+                        "postal_code",
+                        "price",
+                        "facts and features",
+                        "real estate provider",
+                        "url",
+                    ]
+                    writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+                    writer.writeheader()
+                    for row in scraped_data:
+                        writer.writerow(row)
+            finally:
+                await browser.close()
 
 
 def main(zip_code: str, sort: str) -> None:
@@ -114,24 +150,4 @@ def main(zip_code: str, sort: str) -> None:
         zip_code (str): _description_
         sort (str): _description_
     """
-    asyncio.run(get_page())
-    print(f"Fetching data for {zip_code}")
-    scraped_data = parse(zip_code, sort)
-    print("Writing data to output file")
-    with open(f"properties-{zip_code}.csv", "wb") as csv_file:
-        fieldnames = [
-            "title",
-            "address",
-            "city",
-            "state",
-            "postal_code",
-            "price",
-            "facts and features",
-            "real estate provider",
-            "url",
-        ]
-        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-        writer.writeheader()
-        for row in scraped_data:
-            writer.writerow(row)
-
+    asyncio.run(get_page(InputData(zip_code, sort)))

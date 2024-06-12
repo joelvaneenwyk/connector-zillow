@@ -26,6 +26,8 @@ colorama==0.4.6
     # via pytest
 coverage==7.5.3
     # via pytest-cov
+cssselect==1.2.0
+    # via types-lxml
 dill==0.3.8
     # via pylint
 greenlet==3.0.3
@@ -77,9 +79,15 @@ six==1.16.0
     # via python-anticaptcha
 tomlkit==0.12.5
     # via pylint
+types-beautifulsoup4==4.12.0.20240511
+    # via types-lxml
+types-html5lib==1.1.11.20240228
+    # via types-beautifulsoup4
+types-lxml==2024.4.14
 typing-extensions==4.12.2
     # via mypy
     # via pyee
+    # via types-lxml
 unicodecsv==0.14.1
     # via zillow
 urllib3==2.2.1
