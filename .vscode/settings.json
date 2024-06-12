@@ -1,0 +1,17 @@
+{
+    "[python]": {
+        "diffEditor.ignoreTrimWhitespace": false,
+        "gitlens.codeLens.symbolScopes": [
+            "!Module"
+        ],
+        "editor.formatOnType": true,
+        "editor.formatOnSaveMode": "modificationsIfAvailable",
+        "editor.formatOnPaste": false,
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.wordBasedSuggestions": "off"
+    },
+    "ruff.importStrategy": "fromEnvironment",
+    "ruff.enable": true,
+    "ruff.fixAll": true
+}
