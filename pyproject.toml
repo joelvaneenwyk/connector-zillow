@@ -1,0 +1,40 @@
+[project]
+name = "zillow"
+version = "0.1.0"
+description = "Add your description here"
+authors = [{ name = "Joel Van Eenwyk", email = "joel.vaneenwyk@gmail.com" }]
+dependencies = [
+    "argparse>=1.4.0",
+    "lxml>=5.2.2",
+    "python-anticaptcha>=1.0.0",
+    "requests>=2.32.3",
+    "pip>=24.0",
+]
+readme = "README.md"
+requires-python = ">= 3.11"
+
+[project.scripts]
+zillow = "zillow.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = [
+    "ruff>=0.4.8",
+    "uv>=0.2.10",
+    "mypy>=1.10.0",
+    "pyright>=1.1.366",
+]
+
+[tool.rye.scripts]
+typecheck = "pyright"
+z = { call = "zillow.__main__" }
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/zillow"]
