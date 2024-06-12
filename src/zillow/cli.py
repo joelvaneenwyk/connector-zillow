@@ -2,9 +2,9 @@
 """
 
 import asyncio
+import argparse
 from playwright.async_api import async_playwright
 from typing import Optional, List, Any, Dict, TYPE_CHECKING
-
 from lxml import html
 import unicodecsv as csv
 import pathlib
@@ -50,9 +50,6 @@ async def parse(browser: 'Browser', input_data: InputData, filter_request: Optio
 
     properties_list: List[Dict[str, Any]] = []
     for i in range(5):
-        # response = requests.request(
-        #     "GET", url, headers={}, data={}, cookies=cookies_data
-        # )
         await page.goto(url)
         page_data = await page.content()
         await page.screenshot(path=f"example-{i}.png")
@@ -116,7 +113,7 @@ async def parse(browser: 'Browser', input_data: InputData, filter_request: Optio
     return properties_list
 
 
-async def get_page(input_data: InputData):
+async def parse_zillow_pages(input_data: InputData):
     async with async_playwright() as p:
         for browser_type in [p.chromium, p.firefox, p.webkit]:
             browser = await browser_type.launch()
@@ -143,11 +140,24 @@ async def get_page(input_data: InputData):
                 await browser.close()
 
 
-def main(zip_code: str, sort: str) -> None:
+def main() -> None:
     """Parse arguments and start.
 
     Args:
         zip_code (str): _description_
         sort (str): _description_
     """
-    asyncio.run(get_page(InputData(zip_code, sort)))
+    argparser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
+    argparser.add_argument("zipcode", help="Enter the zip code")
+    argparser.add_argument(
+        "sort",
+        nargs="?",
+        help="""available sort orders are :
+        newest : Latest property details,
+        cheapest : Properties with cheapest price""",
+        default="homes for you",
+        choices=["newest", "cheapest"],
+    )
+    args = argparser.parse_args()
+    data = InputData(args.zipcode, args.sort)
+    asyncio.run(parse_zillow_pages(data))
