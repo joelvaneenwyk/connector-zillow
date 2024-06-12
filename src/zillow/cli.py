@@ -1,12 +1,13 @@
 """Parse Zillow for properties in a given location.
 """
 
+import asyncio
+from playwright.async_api import async_playwright
 from typing import Optional, List, Any, Dict
 
 from lxml import html
 import requests
 import unicodecsv as csv
-import argparse
 import pathlib
 
 
@@ -22,7 +23,6 @@ def parse(zip_code: str, filter_request: Optional[str] = None) -> List[Dict[str,
                 cookies_data.setdefault(key, array[1])
     except:
         print("Cookie file not found. Please log in and save the cookies to continue")
-
 
     if filter_request == "newest":
         url = (
@@ -94,7 +94,17 @@ def parse(zip_code: str, filter_request: Optional[str] = None) -> List[Dict[str,
             if is_for_sale:
                 properties_list.append(properties)
 
-        return properties_list
+    return properties_list
+
+
+async def get_page():
+    async with async_playwright() as p:
+        for browser_type in [p.chromium, p.firefox, p.webkit]:
+            browser = await browser_type.launch()
+            page = await browser.new_page()
+            await page.goto("http://playwright.dev")
+            await page.screenshot(path=f"example-{browser_type.name}.png")
+            await browser.close()
 
 
 def main(zip_code: str, sort: str) -> None:
@@ -104,6 +114,7 @@ def main(zip_code: str, sort: str) -> None:
         zip_code (str): _description_
         sort (str): _description_
     """
+    asyncio.run(get_page())
     print(f"Fetching data for {zip_code}")
     scraped_data = parse(zip_code, sort)
     print("Writing data to output file")

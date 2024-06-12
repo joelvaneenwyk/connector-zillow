@@ -10,3 +10,12 @@ wheels/
 .venv/
 .ruff_cache/
 .mypy_cache/
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+/.pnp.cjs
+/.pnp.loader.mjs
+/.yarn/
