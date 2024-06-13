@@ -21,3 +21,7 @@ node_modules/
 /.yarn/
 /*.png
 /*.csv
+
+# Never submit these
+cookies.json
+cookies.txt
