@@ -1,16 +1,17 @@
-"""Parse Zillow for properties in a given location.
-"""
+"""Parse Zillow for properties in a given location."""
 
 import asyncio
 import argparse
 from playwright.async_api import async_playwright
-from typing import Optional, List, Any, Dict, TYPE_CHECKING
+from typing import Optional, List, Any, Dict, TYPE_CHECKING, Sequence
 from lxml import html
 import unicodecsv as csv
 import pathlib
+import json
 
 if TYPE_CHECKING:
     from playwright.async_api._generated import Browser
+    from playwright._impl._api_structures import SetCookieParam
 
 
 class InputData:
@@ -19,27 +20,38 @@ class InputData:
         self.sort = sort
 
 
-async def parse(browser: 'Browser', input_data: InputData, filter_request: Optional[str] = None) -> List[Dict[str, Any]]:
+async def parse(
+    browser: "Browser", input_data: InputData, filter_request: Optional[str] = None
+) -> List[Dict[str, Any]]:
     """Given already opened browser and set of input data, parse Zillow sites to scrape the data we need."""
 
-    page = await browser.new_page()
+    cookie_data_list: Sequence[SetCookieParam] = []
+    root = pathlib.Path().cwd()
+    pyproject = None
+    while root is not None:
+        pyproject = root.joinpath("pyproject.toml")
+        if pyproject.exists():
+            root = None
 
-    cookies_path = pathlib.Path().cwd().joinpath("cookie.txt")
-
-    cookies_data = {}
-    try:
-        with cookies_path.open("r", encoding="utf-8") as fp:
-            for line in fp:
-                array = line.split("\t")
-                key = array.pop(0)
-                cookies_data.setdefault(key, array[1])
-    except IOError:
-        print("Cookie file not found. Please log in and save the cookies to continue")
+    if pyproject is not None:
+        project_intermediate_path = pyproject.parent.joinpath(".build")
+        project_intermediate_path.mkdir(exist_ok=True, parents=True)
+        cookies_path = project_intermediate_path.joinpath("cookies.json")
+        try:
+            with cookies_path.open("r", encoding="utf-8") as fp:
+                cookie_raw_data = json.load(fp)
+                if isinstance(cookie_raw_data, list):
+                    for cookie in cookie_raw_data:
+                        name = cookie.get("name") or cookie.get("domain") or 'other'
+                        cookie["name"] = name
+                        cookie_data_list.append(SetCookieParam(**cookie))
+        except IOError:
+            print(
+                "Cookie file not found. Please log in and save the cookies to continue"
+            )
 
     if filter_request == "newest":
-        url = (
-            f"https://www.zillow.com/homes/for_sale/{input_data.zip_code}/0_singlestory/days_sort"
-        )
+        url = f"https://www.zillow.com/homes/for_sale/{input_data.zip_code}/0_singlestory/days_sort"
     elif filter_request == "cheapest":
         url = f"https://www.zillow.com/homes/for_sale/{input_data.zip_code}/0_singlestory/pricea_sort/"
     else:
@@ -50,12 +62,14 @@ async def parse(browser: 'Browser', input_data: InputData, filter_request: Optio
 
     properties_list: List[Dict[str, Any]] = []
     for i in range(5):
+        context = await browser.new_context()
+        await context.add_cookies(cookie_data_list)
+        page = await context.new_page()
         await page.goto(url)
         page_data = await page.content()
         await page.screenshot(path=f"example-{i}.png")
         print(f"Fetching data for {input_data.zip_code}")
         print(page_data)
-        # print(response.status_code)
 
         parser = html.fromstring(page_data)
         search_results = parser.xpath("//div[@id='search-results']//article")

@@ -2,7 +2,7 @@
 Main Executor
 """
 
-from .cli import main
+from zillow.cli import main
 
 
 if __name__ == "__main__":
