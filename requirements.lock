@@ -21,8 +21,6 @@ idna==3.7
     # via requests
 lxml==5.2.2
     # via zillow
-pip==24.0
-    # via zillow
 playwright==1.44.0
     # via zillow
 pyee==11.1.0
@@ -38,5 +36,5 @@ typing-extensions==4.12.2
     # via pyee
 unicodecsv==0.14.1
     # via zillow
-urllib3==2.2.1
+urllib3==2.2.2
     # via requests

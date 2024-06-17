@@ -1,8 +1,10 @@
 from playwright.async_api import Page, expect
 import re
 from zillow.parse import get_cookies
+import pytest
 
 
+@pytest.mark.asyncio
 async def test_zillow_parser(page: Page):
     cookies = get_cookies()
     assert cookies is not None

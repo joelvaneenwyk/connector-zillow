@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Optional, Sequence
 import unicodecsv as csv
 from lxml import html
 from playwright._impl._api_structures import SetCookieParam
-from playwright.async_api import Page, async_playwright
+from playwright.async_api import Page, Browser
 
 
 class InputData:
@@ -142,14 +142,8 @@ async def parse(
     return properties_list
 
 
-async def parse_zillow_pages(input_data: InputData):
-    async with async_playwright() as p:
-        for browser_type in [p.chromium, p.firefox, p.webkit]:
-            browser = await browser_type.launch()
-            try:
-                page = await browser.new_page()
-                await page.context.clear_cookies()
-                await page.context.add_cookies(get_cookies())
-                await parse(page, input_data)
-            finally:
-                await browser.close()
+async def parse_zillow_pages(input_data: InputData, browser: Browser):
+    page = await browser.new_page()
+    await page.context.clear_cookies()
+    await page.context.add_cookies(get_cookies())
+    await parse(page, input_data)

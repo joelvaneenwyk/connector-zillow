@@ -4,6 +4,17 @@ import argparse
 import asyncio
 
 from zillow.parse import InputData, parse_zillow_pages
+from playwright.async_api import async_playwright
+
+
+async def run_zillow_parse(input_data: InputData):
+    async with async_playwright() as p:
+        browser_type = p.chromium
+        browser = await browser_type.launch()
+        try:
+            await parse_zillow_pages(input_data, browser)
+        finally:
+            await browser.close()
 
 
 def main() -> None:
@@ -26,4 +37,5 @@ def main() -> None:
     )
     args = argparser.parse_args()
     data = InputData(args.zipcode, args.sort)
-    asyncio.run(parse_zillow_pages(data))
+
+    asyncio.run(run_zillow_parse(data))

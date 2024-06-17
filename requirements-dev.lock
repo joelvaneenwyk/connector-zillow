@@ -13,9 +13,20 @@ argparse==1.4.0
     # via zillow
 astroid==3.2.2
     # via pylint
+attrs==23.2.0
+    # via autobahn
+    # via automat
+    # via service-identity
+    # via twisted
+autobahn==23.6.2
+automat==22.10.0
+    # via twisted
 black==24.4.2
 certifi==2024.6.2
     # via requests
+cffi==1.16.0
+    # via cryptography
+    # via pynacl
 charset-normalizer==3.3.2
     # via requests
 click==8.1.7
@@ -24,16 +35,29 @@ colorama==0.4.6
     # via click
     # via pylint
     # via pytest
+    # via qrcode
+constantly==23.10.4
+    # via twisted
 coverage==7.5.3
     # via pytest-cov
+cryptography==42.0.8
+    # via autobahn
+    # via pyopenssl
+    # via service-identity
 cssselect==1.2.0
     # via types-lxml
 dill==0.3.8
     # via pylint
 greenlet==3.0.3
     # via playwright
+hyperlink==21.0.0
+    # via autobahn
+    # via twisted
 idna==3.7
+    # via hyperlink
     # via requests
+incremental==22.10.0
+    # via twisted
 iniconfig==2.0.0
     # via pytest
 isort==5.13.2
@@ -53,45 +77,68 @@ packaging==24.1
     # via pytest
 pathspec==0.12.1
     # via black
+pillow==10.3.0
 pip==24.0
-    # via zillow
+pixelmatch==0.3.0
 platformdirs==4.2.2
     # via black
     # via pylint
 playwright==1.44.0
-    # via pytest-playwright
     # via zillow
 pluggy==1.5.0
     # via pytest
+pyasn1==0.6.0
+    # via pyasn1-modules
+    # via service-identity
+pyasn1-modules==0.4.0
+    # via service-identity
+pycparser==2.22
+    # via cffi
 pyee==11.1.0
     # via playwright
 pylint==3.2.3
-pyright==1.1.366
+pynacl==1.5.0
+    # via autobahn
+pyopenssl==24.1.0
+    # via autobahn
+pypng==0.20220715.0
+    # via qrcode
+pyright==1.1.367
 pytest==8.2.2
     # via pytest-asyncio
-    # via pytest-base-url
     # via pytest-cov
-    # via pytest-playwright
 pytest-asyncio==0.23.7
-pytest-base-url==2.1.0
-    # via pytest-playwright
 pytest-cov==5.0.0
-pytest-playwright==0.5.0
+    # via pytest-cover
+pytest-cover==3.0.0
 python-anticaptcha==1.0.0
     # via zillow
-python-slugify==8.0.4
-    # via pytest-playwright
+pytrie==0.4.0
+    # via autobahn
+qrcode==7.4.2
+    # via autobahn
 requests==2.32.3
-    # via pytest-base-url
     # via python-anticaptcha
     # via zillow
-ruff==0.4.8
+ruff==0.4.9
+service-identity==24.1.0
+    # via autobahn
+setuptools==70.0.0
+    # via autobahn
+    # via zope-interface
 six==1.16.0
+    # via automat
     # via python-anticaptcha
-text-unidecode==1.3
-    # via python-slugify
+sortedcontainers==2.4.0
+    # via pytrie
 tomlkit==0.12.5
     # via pylint
+twisted==24.3.0
+    # via autobahn
+twisted-iocpsupport==1.0.4
+    # via twisted
+txaio==23.1.1
+    # via autobahn
 types-beautifulsoup4==4.12.0.20240511
     # via types-lxml
 types-html5lib==1.1.11.20240228
@@ -100,9 +147,14 @@ types-lxml==2024.4.14
 typing-extensions==4.12.2
     # via mypy
     # via pyee
+    # via qrcode
+    # via twisted
     # via types-lxml
 unicodecsv==0.14.1
     # via zillow
-urllib3==2.2.1
+urllib3==2.2.2
     # via requests
-uv==0.2.10
+uv==0.2.12
+zope-interface==6.4.post2
+    # via autobahn
+    # via twisted
