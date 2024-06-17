@@ -1,16 +1,21 @@
-# python generated files
+#
+# Zillow Connector - Git Ignore
+#
+
+# Python generated files
 __pycache__/
 *.py[oc]
 build/
 dist/
 wheels/
 *.egg-info
-
-# venv
 .venv/
 .ruff_cache/
 .mypy_cache/
+.build/
+.pytest_cache/
 node_modules/
+
 /test-results/
 /playwright-report/
 /blob-report/
@@ -23,5 +28,6 @@ node_modules/
 /*.csv
 
 # Never submit these
-cookies.json
-cookies.txt
+cookies*.json
+cookies*.txt
+

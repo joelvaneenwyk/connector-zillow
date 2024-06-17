@@ -9,7 +9,11 @@
             "type": "debugpy",
             "request": "launch",
             "program": "src/zillow/__main__.py",
-            "args": ["94105", "newest"],
+            "args": [
+                "94105",
+                "newest"
+            ],
+            "justMyCode": false,
             "console": "integratedTerminal"
         }
     ]
