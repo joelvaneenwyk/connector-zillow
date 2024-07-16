@@ -1,22 +1,28 @@
 name: Build
 on:
   push:
-    branches: [ main, develop, master ]
+    branches: [ main, develop ]
   pull_request:
-    branches: [ main, develop, master ]
+    branches: [ main, develop ]
 
 jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+
     steps:
     - uses: actions/checkout@v4
+
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
 
     - name: Install the latest version of rye
-      uses: eifinger/setup-rye@v3
+      uses: eifinger/setup-rye@v4.2.0
 
-    - run: rye build
+    # Install all dependencies for Playwright
+    - run: npx playwright install-deps
+
+    # Build the package and then run tests using Playwright
+    - run: rye build          
     - run: rye test
