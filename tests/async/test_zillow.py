@@ -1,7 +1,9 @@
-from playwright.async_api import Page, expect
 import re
-from zillow.parse import get_cookies
+
 import pytest
+from playwright.async_api import Page, expect
+
+from zillow.parse import get_cookies
 
 
 @pytest.mark.asyncio

@@ -16,7 +16,6 @@ import asyncio
 from typing import Any, AsyncGenerator, Awaitable, Callable, Dict, Generator, List
 
 import pytest
-
 from playwright.async_api import (
     Browser,
     BrowserContext,

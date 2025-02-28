@@ -22,12 +22,11 @@ import sys
 from pathlib import Path
 from typing import Any, AsyncGenerator, Callable, Dict, Generator, List, Optional, cast
 
+import playwright
 import pytest
 from PIL import Image
 from pixelmatch import pixelmatch
 from pixelmatch.contrib.PIL import from_PIL_to_raw_data
-
-import playwright
 from playwright._impl._path_utils import get_file_dirname
 
 from .server import Server, test_server

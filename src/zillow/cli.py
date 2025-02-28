@@ -141,7 +141,7 @@ async def run_zillow_parse(data: InputData) -> None:
             except Exception:
                 print("Failed backup parse")
                 scraped_data = []
-            
+
         finally:
             await browser.close()
 

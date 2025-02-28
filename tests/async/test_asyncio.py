@@ -17,8 +17,8 @@ import gc
 from typing import Dict
 
 import pytest
-
 from playwright.async_api import async_playwright
+
 from ..server import Server
 from ..utils import TARGET_CLOSED_ERROR_MESSAGE
 
