@@ -172,11 +172,10 @@ def main() -> None:
         sort (str): _description_
     """
     argparser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-    argparser.add_argument("zipcode", help="Enter the zip code")
+    argparser.add_argument("-z", "--zipcode", action="store", help="Enter the zip code", default="19406")
     argparser.add_argument(
-        "sort",
-        nargs="?",
-        help="""available sort orders are :
+        "-s", "--sort",
+        help="""available sort orders are:
         newest : Latest property details,
         cheapest : Properties with cheapest price""",
         default="homes for you",
